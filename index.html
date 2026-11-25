@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DPMU Karyavrit Quality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a state review register — calm, factual, newspaper graphics desk.
+   IDEA: the karyavrit file register: each month a page, each district a line, stamped with a band.
+   PICTURE: the district × month register grid on the Composite tab; the drop tray on Upload.
+   COLOUR and TYPE: survey-map card — land #fbfbf2, sea #bfe3ee, contour brown, magenta accent; Overpass.
+   LAYOUT: tab bar, then one working surface per tab; tables scroll, stack on phones. */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbfbf2,#0d1c24);--panel:light-dark(#ffffff,#13262f);--ink:light-dark(#13242e,#e6eef0);--mute:light-dark(#5a6b73,#9fb3ba);
+--line:light-dark(#dde3dc,#24404b);--sea:light-dark(#bfe3ee,#1d4a5a);--brown:light-dark(#a8551b,#e08a4a);--mag:light-dark(#d6127e,#ff5fb0);
+--fn:light-dark(#1f6f86,#5ec2dd);--dv:light-dark(#b8741f,#e4a656);--ns:light-dark(#c2185b,#ff6fa8);--nh:light-dark(#8a959a,#6b7b82);--pd:light-dark(#d5dad6,#2c3e46)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,"Noto Sans Devanagari",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4vw,44px);font-weight:800}
+h2{font-size:24px;font-weight:800;margin-bottom:12px}
+h3{font-size:17px;font-weight:800;margin:18px 0 8px}
+.band{padding:clamp(20px,3.5vw,48px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header.band{background:var(--sea);padding-bottom:0}
+.sub{color:var(--mute);max-width:70ch;margin:8px 0 18px}
+header .sub{color:var(--ink);opacity:.8}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{font:600 16px Overpass,sans-serif;border:0;background:transparent;color:var(--ink);padding:12px 18px;min-height:44px;border-radius:10px 10px 0 0;cursor:pointer}
+nav.tabs button[aria-selected=true]{background:var(--bg)}
+button,select,input,textarea{font:inherit;font-size:16px;color:inherit}
+select,input,textarea{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-height:44px;width:100%}
+textarea{min-height:88px}
+:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:10px 18px;min-height:44px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:var(--ns);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.row>label{flex:1 1 180px}
+label>span{display:block;font-size:13px;color:var(--mute);margin-bottom:4px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px}
+.dlg{position:fixed;inset:0;background:rgba(10,20,25,.55);display:flex;justify-content:flex-end;z-index:9}.dlg>div{background:var(--bg);width:min(720px,100%);height:100%;overflow:auto;padding:24px}
+.drop{border:2px dashed var(--brown);border-radius:14px;padding:34px 18px;text-align:center;background:light-dark(#fff8ef,#1a2a2f);cursor:pointer;transition:background .2s}
+.drop.on{background:var(--sea)}
+.drop strong{font-size:20px;display:block}
+.drop.locked{opacity:.5;pointer-events:none;border-color:var(--line)}
+.files{font-size:14px;color:var(--mute);margin-top:8px}
+.status{margin-top:12px;font-size:15px}
+.status.err{color:var(--ns)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0 22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:clamp(26px,3vw,36px);font-weight:800;line-height:1.1}
+.kpi small{color:var(--mute);font-size:13px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;color:#fff}
+.b-Functional{background:var(--fn)}.b-Developing{background:var(--dv)}.b-Needs{background:var(--ns)}.b-Not{background:var(--nh)}.b-Pending{background:var(--pd);color:var(--ink)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--mute);font-weight:600;white-space:nowrap}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.click{cursor:pointer}tr.click:hover td{background:light-dark(#f2f6f1,#173039)}
+.bars .r{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 48px;gap:10px;align-items:center;padding:5px 0;font-size:14px}
+.stackbar{display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--pd)}
+.stackbar i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:6px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.heat td.c{text-align:center;font-weight:600;font-size:13px;min-width:62px;color:#fff;border:2px solid var(--bg)}
+.heat td.c.e{background:transparent;color:var(--mute);font-weight:400}
+.heat th.sticky,.heat td.sticky{position:sticky;left:0;background:var(--bg);z-index:1}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:12px 14px 14px;margin:0 0 14px}
+legend{font-weight:800;padding:0 6px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:10px 14px}
+.fgrid label.wide{grid-column:1/-1}
+.scorebar{position:sticky;top:0;z-index:3;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.scorebar b{font-size:24px;font-weight:800}
+.scorebar span{font-size:13px;color:var(--mute);display:block}.scorebar .pill{display:inline-block;color:#fff}.scorebar .pill.b-Pending{color:var(--ink)}
+.note{font-size:13px;color:var(--mute)}
+.warnbox{border-left:4px solid var(--brown);background:light-dark(#fff4e8,#2a2418);padding:10px 12px;border-radius:6px;margin:10px 0;font-size:15px}
+.fig{position:relative;min-height:260px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.hidden{display:none!important}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--mag);border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mute)}.stack td:empty{display:none}.bars .r{grid-template-columns:1fr 48px}.bars .r .stackbar{grid-column:1/-1;grid-row:2}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+<script src="config.js"></script>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <h1>DPMU karyavrit quality register</h1>
+  <p class="sub">Every district's monthly DPMU minutes, read by Claude and scored on the tracker's 100-point rubric (Process 20, Agenda 50, Follow-through 30). Add karyavrit links in the Google Sheet; new ones are read once a day.</p>
+  <div class="row" style="align-items:center;margin-bottom:14px">
+    <button class="btn" id="refresh" type="button">Refresh</button>
+    <span id="sync" class="note" aria-live="polite"></span>
+  </div>
+  <div id="nobackend" class="warnbox hidden">This site isn't connected to its Google Sheet yet. Add the Apps Script web-app URL to <b>config.js</b> (see README.md).</div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="t-month" aria-selected="true">Monthly dashboard</button>
+    <button role="tab" id="t-comp" aria-selected="false">Composite scores</button>
+  </nav>
+</div></header>
+
+<main>
+<section class="band" id="p-month"><div class="wrap">
+  <div class="row">
+    <label style="flex:0 1 220px"><span>Month</span><select id="m-month"></select></label>
+    <label style="flex:0 1 220px"><span>Mandal</span><select id="m-mandal"></select></label>
+    <span style="flex:1"></span>
+    <button class="btn ghost" id="m-csv">Export tracker CSV</button>
+  </div>
+  <h2 id="m-title" style="margin-top:20px"></h2>
+  <div class="kpis" id="m-kpis"></div>
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:0">Quality bands</h3><div id="m-bands"></div>
+      <h3>Process checks (of meetings held)</h3><div id="m-proc" class="bars"></div></div>
+    <div class="card"><h3 style="margin-top:0">Agenda and discussion quality (of meetings held)</h3>
+      <div class="legend"><span><i style="background:var(--fn)"></i>Yes</span><span><i style="background:var(--dv)"></i>Partial</span><span><i style="background:var(--pd)"></i>No / not recorded</span></div>
+      <div id="m-agenda" class="bars"></div></div>
+  </div>
+  <h3>Districts this month</h3>
+  <p class="note">Select a district to see everything read from its karyavrit. To correct a value, edit that row in the Google Sheet.</p>
+  <div class="scroll"><table class="stack" id="m-table"></table></div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="card"><h3 style="margin-top:0">Recurring themes</h3><div id="m-themes" class="bars"></div></div>
+    <div class="card"><h3 style="margin-top:0">Source and verification</h3><div id="m-src"></div></div>
+  </div>
+</div></section>
+
+<section class="band hidden" id="p-comp"><div class="wrap">
+  <div class="row">
+    <label style="flex:0 1 220px"><span>Mandal</span><select id="c-mandal"></select></label>
+    <label style="flex:0 1 220px"><span>Sort districts by</span><select id="c-sort"><option value="comp">Composite score</option><option value="name">Name</option><option value="mandal">Mandal</option></select></label>
+  </div>
+  <h2 id="c-title" style="margin-top:20px"></h2>
+  <div class="kpis" id="c-kpis"></div>
+  <div class="card"><h3 style="margin-top:0">State average score and karyavrits read, by month</h3><div class="fig" id="c-fig"><svg id="c-svg" role="img" aria-label="Average score by month"></svg></div></div>
+  <h3>District register (score out of 100 each month)</h3>
+  <div class="legend"><span><i style="background:var(--fn)"></i>Functional ≥75</span><span><i style="background:var(--dv)"></i>Developing 50–74</span><span><i style="background:var(--ns)"></i>Needs support &lt;50</span><span><i style="background:var(--nh)"></i>Not held</span></div>
+  <p class="note">Composite = average total across every month with a karyavrit read. A "Not held" month counts as 0, and months with no karyavrit are left out.</p>
+  <div class="scroll"><table class="heat" id="c-table"></table></div>
+  <h3>Mandal composite</h3>
+  <div class="scroll"><table class="stack" id="c-mandals"></table></div>
+</div></section>
+</main>
+
+<div class="dlg hidden" id="dlg" role="dialog" aria-modal="true" aria-labelledby="d-title"><div>
+  <div class="row" style="justify-content:space-between;align-items:center"><h2 id="d-title" style="margin:0"></h2><button class="btn ghost" id="d-close" type="button">Close</button></div>
+  <div id="d-body"></div>
+</div></div>
+
+<footer class="band note"><div class="wrap" id="foot">Scoring weights and thresholds are from the Scoring sheet of DPMU_Meeting_Quality_Tracker_v2.xlsx. Claude's reading of a scan can be wrong, so check Low-confidence rows before relying on their scores.</div></footer>
+
+<script>
+{
+/* ---------- reference data ---------- */
+const DIST=[["Agra","Agra"],["Aligarh","Aligarh"],["Ambedkar Nagar","Ayodhya"],["Amethi","Ayodhya"],["Amroha","Moradabad"],["Auraiya","Kanpur"],["Azamgarh","Azamgarh"],["Baghpat","Meerut"],["Bahraich","Devipatan","Devam"],["Ballia","Azamgarh"],["Balrampur","Devipatan","Devam"],["Banda","Chitrakoot"],["Barabanki","Ayodhya"],["Bareilly","Bareilly","Saurabh"],["Basti","Basti"],["Bhadohi","Mirzapur"],["Bijnor","Moradabad"],["Budaun","Bareilly","Saurabh"],["Bulandshahr","Meerut"],["Chandauli","Varanasi"],["Chitrakoot","Chitrakoot"],["Deoria","Gorakhpur"],["Etah","Aligarh"],["Etawah","Kanpur"],["Faizabad","Ayodhya"],["Farrukhabad","Kanpur"],["Fatehpur","Prayagraj","Amrita"],["Firozabad","Agra"],["Gautam Buddha Nagar","Meerut"],["Ghaziabad","Meerut"],["Ghazipur","Varanasi"],["Gonda","Devipatan","Devam"],["Gorakhpur","Gorakhpur"],["Hamirpur","Chitrakoot"],["Hapur","Meerut"],["Hardoi","Lucknow"],["Hathras","Aligarh"],["Jalaun","Jhansi"],["Jaunpur","Varanasi"],["Jhansi","Jhansi"],["Kannauj","Kanpur"],["Kanpur Dehat","Kanpur"],["Kanpur Nagar","Kanpur"],["Kanshiram Nagar","Aligarh"],["Kaushambi","Prayagraj","Amrita"],["Kheri","Lucknow"],["Kushinagar","Gorakhpur"],["Lalitpur","Jhansi"],["Lucknow","Lucknow"],["Maharajganj","Gorakhpur"],["Mahoba","Chitrakoot"],["Mainpuri","Agra"],["Mathura","Agra"],["Mau","Azamgarh"],["Meerut","Meerut"],["Mirzapur","Mirzapur"],["Moradabad","Moradabad"],["Muzaffarnagar","Saharanpur"],["Pilibhit","Bareilly","Saurabh"],["Pratapgarh","Prayagraj","Amrita"],["Prayagraj","Prayagraj","Amrita"],["Rae Bareli","Lucknow"],["Rampur","Moradabad"],["Saharanpur","Saharanpur"],["Sambhal","Moradabad"],["Sant Kabir Nagar","Basti"],["Shahjahanpur","Bareilly","Saurabh"],["Shamli","Saharanpur"],["Shrawasti","Devipatan","Devam"],["Siddharthnagar","Basti"],["Sitapur","Lucknow"],["Sonbhadra","Mirzapur"],["Sultanpur","Ayodhya"],["Unnao","Lucknow"],["Varanasi","Varanasi"]];
+const MANDAL=Object.fromEntries(DIST.map(d=>[d[0],d[1]])),PMOF=Object.fromEntries(DIST.map(d=>[d[0],d[2]||""]));
+const MANDALS=[...new Set(DIST.map(d=>d[1]))].sort();
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const mkey=m=>{const[a,y]=String(m).split("-");return (+y||0)*100+MON.indexOf(a)};
+/* tracker columns F..BF: [code,label,group] */
+const F=[["F","Meeting held?","Meeting basics"],["G","Meeting date","Meeting basics"],["H","Chaired by","Meeting basics"],["I","Members expected (no.)","Attendance"],["J","Members present (no.)","Attendance"],["K","All SRGs present?","Attendance"],["L","DCT and DCN present?","Attendance"],["M","Attendance remarks (who was absent)","Attendance"],["N","Agenda circulated before meeting?","Preparation & documents"],["O","Presentation / data report used?","Preparation & documents"],["P","Data pack shared before meeting?","Preparation & documents"],["Q","Action plan (5W-1H) created?","Preparation & documents"],["R","1. Previous decisions reviewed","Agenda items discussed"],["S","2. Financial progress","Agenda items discussed"],["T","3. Academic indicators (NBMC)","Agenda items discussed"],["U","4. Learning outcomes / SPOT data","Agenda items discussed"],["V","5. Special initiatives (Toolkit, Reading, Catch-up)","Agenda items discussed"],["W","6. Review meetings (DTF, BSA–BEO, BEO–HM, Sankul)","Agenda items discussed"],["X","7. Supportive supervision & visits","Agenda items discussed"],["Y","8. RCA, best practice, district plan","Agenda items discussed"],["Z","NIPUN / learning data with block or school numbers?","Quality of discussion"],["AA","Weak competencies / focus blocks named?","Quality of discussion"],["AB","SRGs presented analysis?","Quality of discussion"],["AC","Monthly priorities / key messages delivered?","Quality of discussion"],["AD","Bottom performers called out with follow-up?","Quality of discussion"],["AE","Top performers appreciated?","Quality of discussion"],["AF","Challenges discussed and solutions agreed?","Quality of discussion"],["AG","Root cause identified (not just symptom)?","Quality of discussion"],["AH","No. of actions / decisions","Quality of discussion"],["AI","No. of actions with owner + deadline","Quality of discussion"],["AJ","Previous month's actions closed (%)","Quality of discussion"],["AK","Escalation to DM/CDO/State?","Quality of discussion"],["AL","Performers named (bottom / top)","Qualitative remarks"],["AM","Good practice noted","Qualitative remarks"],["AN","Key decisions (short summary)","Qualitative remarks"],["AO","Theme 1","Qualitative remarks"],["AP","Theme 2","Qualitative remarks"],["AQ","Theme 3","Qualitative remarks"],["AR","Filled by","Source"],["AS","AI confidence","Source"],["AT","AI notes: unclear / not recorded","Source"],["AU","PM presence in meeting","PM observation, portal & calls"],["AV","Pre-alignment with chair done?","PM observation, portal & calls"],["AW","Action plan shared on WhatsApp group?","PM observation, portal & calls"],["AX","MoM uploaded on portal?","PM observation, portal & calls"],["AY","MoM upload date","PM observation, portal & calls"],["AZ","DCN in post?","PM observation, portal & calls"],["BA","Reviewer / PM name","PM observation, portal & calls"],["BB","VSK / team call done?","PM observation, portal & calls"],["BC","Call date","PM observation, portal & calls"],["BD","MoM matches call?","PM observation, portal & calls"],["BE","PM overall rating (1–5)","PM observation, portal & calls"],["BF","PM overall qualitative remarks","PM observation, portal & calls"]];
+const FBY=Object.fromEntries(F.map(f=>[f[0],f]));
+const AGENDA_COLS=["N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","AB","AC","AD","AE","AF","AG"];
+const DPMU="District (DPMU)";
+
+/* ---------- scoring: Tracker!BM:BQ and the Scoring sheet ---------- */
+const W={fw:4,ch:4,att:3,N:2,AV:2,O:2,P:1,up:2,R:5,S:4,T:6,U:5,Z:5,V:5,W:4,X:6,AB:5,AC:5,Y:2,AG:4,AA:4,AD:3,AE:2,AF:2,Q:3,own:3,cl:4,AW:1,AK:1,AM:1};
+const TH={fn:75,dv:50,a1:.8,a2:.6,c1:.6,c2:.4};
+const rightChair=(fo,h)=>(fo==="District (DPMU)"&&h==="BSA")||(fo==="DTF"&&h==="DM")||(fo==="Block review"&&h==="BEO");
+const yp=v=>v==="Yes"?1:v==="Partial"?.5:0;
+const num=v=>v===""||v==null||isNaN(+v)?null:+v;
+const dayOf=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||"")?+s.slice(8):null;
+function netdays(a,b){if(!/^\d{4}-\d{2}-\d{2}$/.test(a||"")||!/^\d{4}-\d{2}-\d{2}$/.test(b||""))return null;let d1=new Date(a+"T00:00Z"),d2=new Date(b+"T00:00Z"),s=1;if(d2<d1){[d1,d2]=[d2,d1];s=-1}let n=0;for(let d=new Date(d1);d<=d2;d.setUTCDate(d.getUTCDate()+1)){const w=d.getUTCDay();if(w&&w<6)n++}return s*n-1}
+function score(f,forum){
+  const out={att:null,bk:null,bl:null,first:null};
+  const I=num(f.I),J=num(f.J);out.att=I&&J!=null?J/I:null;
+  out.bk=netdays(f.G,f.AY);
+  const AH=num(f.AH),AI=num(f.AI);out.bl=AH&&AI!=null?AI/AH:null;
+  const d=dayOf(f.G);out.first=f.F==="Yes"&&d!=null?(d<=7?"Yes":"No"):null;
+  if(!f.F||f.F==="Not recorded"){out.band="Pending";return out}
+  if(f.F!=="Yes"){Object.assign(out,{p:0,a:0,ft:0,t:0,band:"Not held"});return out}
+  let p=(d==null?0:d<=7?W.fw:d<=15?W.fw/2:0);
+  p+=rightChair(forum,f.H)?W.ch:f.H==="Nominee of chair"?W.ch/2:0;
+  p+=out.att==null?0:out.att>=TH.a1?W.att:out.att>=TH.a2?W.att/2:0;
+  p+=W.N*yp(f.N)+(f.AV==="Yes"?W.AV:0)+W.O*yp(f.O)+W.P*yp(f.P);
+  p+=out.bk==null?0:out.bk<=3?W.up:out.bk<=7?W.up/2:0;
+  let a=0;for(const k of["R","S","T","U","Z","V","W","X","AB","AC"])a+=W[k]*yp(f[k]);
+  let t=0;for(const k of["Y","AG","AA","AD","AE","AF","Q"])t+=W[k]*yp(f[k]);
+  t+=out.bl==null?0:out.bl>=.9?W.own:out.bl>=.5?W.own/2:0;
+  const aj=num(f.AJ);t+=aj==null?0:aj/100>=TH.c1?W.cl:aj/100>=TH.c2?W.cl/2:0;
+  t+=(f.AW==="Yes"?W.AW:0)+(f.AK==="Yes"?W.AK:0)+((f.AM||"").trim()?W.AM:0);
+  Object.assign(out,{p,a,ft:t,t:p+a+t});out.band=out.t>=TH.fn?"Functional":out.t>=TH.dv?"Developing":"Needs support";return out}
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct=x=>x==null||isNaN(x)?"–":Math.round(x*100)+"%";
+const f1=x=>x==null||x===""?"–":(Math.round(x*10)/10).toString();
+const bandCls=b=>"b-"+String(b||"Pending").split(" ")[0];
+const pill=b=>`<span class="pill ${bandCls(b)}">${esc(b||"Pending")}</span>`;
+const safeUrl=u=>/^https:\/\//i.test(String(u||""))?String(u):"";
+const S=r=>r._s||(r._s=score(r.f||{},DPMU));
+const isRead=r=>r.status==="Read";
+
+/* ---------- data ---------- */
+const BACKEND=String((window.DPMU_CONFIG||{}).backendUrl||"").trim();
+let RECS=[],PRIOS={};
+function ingest(j){
+  RECS=(j.records||[]).filter(r=>r&&r.month&&r.district).map(r=>({...r,f:r.f||{}}));
+  PRIOS=j.priorities||{};
+  const read=RECS.filter(isRead).length;
+  $("foot").textContent=`${read} karyavrits read across ${new Set(RECS.filter(isRead).map(r=>r.month)).size} months. Data as of ${j.updated?new Date(j.updated).toLocaleString():"now"}. Scoring weights and thresholds are from the Scoring sheet of DPMU_Meeting_Quality_Tracker_v2.xlsx; check Low-confidence rows before relying on their scores.`;
+  render()}
+async function load(){
+  if(!BACKEND){$("nobackend").classList.remove("hidden");render();return}
+  $("sync").textContent="Loading…";
+  try{const r=await fetch(BACKEND);const j=await r.json();if(j.error)throw new Error(j.error);ingest(j);$("sync").textContent=""}
+  catch(e){$("sync").textContent="Couldn't load the register: "+(e.message||"network error")}}
+$("refresh").onclick=async()=>{
+  if(!BACKEND)return;const b=$("refresh");b.disabled=true;
+  $("sync").innerHTML=`<span class="spin"></span>Checking the sheet for new results…`;
+  try{const r=await fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"sync"})});const j=await r.json();if(j.error)throw new Error(j.error);ingest(j);
+    const s=j.sync||{};$("sync").textContent=s.busy?"Another refresh is already reading karyavrits. Showing the latest data; try again in a few minutes.":
+      `Up to date. ${s.read||0} new karyavrit${s.read===1?"":"s"} read${s.errors?`, ${s.errors} could not be read (see Status in the sheet)`:""}${s.waiting?(s.mode==="daily"?`, ${s.waiting} new link${s.waiting===1?"":"s"} will be read by the daily Claude task`:`, ${s.waiting} still waiting: press Refresh again or they'll be read within the hour`):""}.`}
+  catch(e){$("sync").textContent="Refresh failed: "+(e.message||"network error")}
+  finally{b.disabled=false}};
+
+/* ---------- tabs ---------- */
+const TABS={"t-month":"p-month","t-comp":"p-comp"};
+function showTab(t){for(const k in TABS){$(k).setAttribute("aria-selected",k===t);$(TABS[k]).classList.toggle("hidden",k!==t)}location.hash=t==="t-month"?"monthly":"composite";render()}
+for(const k in TABS)$(k).onclick=()=>showTab(k);
+function render(){if($("p-month").classList.contains("hidden"))renderComp();else renderMonth()}
+
+const mandalOpts=`<option value="">All mandals</option>`+MANDALS.map(m=>`<option>${esc(m)}</option>`).join("");
+$("m-mandal").innerHTML=mandalOpts;$("c-mandal").innerHTML=mandalOpts;
+function months(){return [...new Set(RECS.map(r=>r.month))].sort((a,b)=>mkey(a)-mkey(b))}
+
+/* ---------- monthly ---------- */
+function brow(label,v,max,color,txt){return `<div class="r"><span>${esc(label)}</span><div class="stackbar"><i style="width:${max?v/max*100:0}%;background:${color||"var(--brown)"}"></i></div><span style="text-align:right">${esc(txt??v)}</span></div>`}
+function srow(label,y,p,n){const t=y+p+n||1;return `<div class="r"><span>${esc(label)}</span><div class="stackbar" title="Yes ${y}, Partial ${p}, No ${n}"><i style="width:${y/t*100}%;background:var(--fn)"></i><i style="width:${p/t*100}%;background:var(--dv)"></i></div><span style="text-align:right">${Math.round(y/t*100)}%</span></div>`}
+function renderMonth(){
+  const ms=months(),sel=$("m-month").value;
+  $("m-month").innerHTML=(ms.length?ms:["–"]).map(m=>`<option>${esc(m)}</option>`).join("");
+  $("m-month").value=ms.includes(sel)?sel:(ms[ms.length-1]||"–");
+  const m=$("m-month").value,md=$("m-mandal").value;
+  const inM=RECS.filter(r=>r.month===m&&(!md||MANDAL[r.district]===md));
+  const rs=inM.filter(isRead),held=rs.filter(r=>r.f.F==="Yes");
+  const nD=md?DIST.filter(d=>d[1]===md).length:75;
+  const avg=held.length?held.reduce((a,r)=>a+S(r).t,0)/held.length:null;
+  const cnt=b=>rs.filter(r=>S(r).band===b).length;
+  $("m-title").textContent=!ms.length?"No karyavrits in the register yet":rs.length?`${m}: ${held.length} DPMU meetings held, average ${f1(avg)}/100`:`${m}: no karyavrits read yet`;
+  $("m-kpis").innerHTML=[[`${new Set(rs.map(r=>r.district)).size} / ${nD}`,"districts with a karyavrit read"],[f1(avg),"average score /100"],[cnt("Functional"),"Functional (≥75)"],[cnt("Developing"),"Developing (50–74)"],[cnt("Needs support"),"Needs support (<50)"],[inM.filter(r=>r.link&&!isRead(r)).length,"links waiting or with errors"]].map(k=>`<div class="kpi"><b>${esc(k[0])}</b><small>${esc(k[1])}</small></div>`).join("");
+  const BANDS=[["Functional","var(--fn)"],["Developing","var(--dv)"],["Needs support","var(--ns)"],["Not held","var(--nh)"],["Pending","var(--pd)"]];
+  const bmax=Math.max(1,...BANDS.map(b=>cnt(b[0])));
+  $("m-bands").innerHTML=`<div class="bars">${BANDS.map(([b,c])=>brow(b,cnt(b),bmax,c)).join("")}</div>`;
+  const H=held.length||1,num=v=>v===""||v==null||isNaN(+v)?null:+v;
+  const pr=[["Held in first week",held.filter(r=>S(r).first==="Yes").length],["Chaired by the BSA",held.filter(r=>r.f.H==="BSA").length],["Attendance ≥80%",held.filter(r=>S(r).att!=null&&S(r).att>=.8).length],["Pre-aligned with chair",held.filter(r=>r.f.AV==="Yes").length],["Action plan on WhatsApp",held.filter(r=>r.f.AW==="Yes").length],["MoM uploaded within 3 working days",held.filter(r=>S(r).bk!=null&&S(r).bk<=3).length],["≥60% of last month's actions closed",held.filter(r=>num(r.f.AJ)!=null&&num(r.f.AJ)>=60).length],["Actions with owner + deadline ≥90%",held.filter(r=>S(r).bl!=null&&S(r).bl>=.9).length]];
+  const none=`<p class="note">No meetings held in this selection.</p>`;
+  $("m-proc").innerHTML=held.length?pr.map(([l,v])=>brow(l,v,H,"var(--fn)",Math.round(v/H*100)+"%")).join(""):none;
+  $("m-agenda").innerHTML=held.length?AGENDA_COLS.map(c=>srow(FBY[c][1],held.filter(r=>r.f[c]==="Yes").length,held.filter(r=>r.f[c]==="Partial").length,held.filter(r=>r.f[c]!=="Yes"&&r.f[c]!=="Partial").length)).join(""):none;
+  const rows=DIST.filter(d=>!md||d[1]===md).map(d=>inM.filter(r=>r.district===d[0]).pop()||{district:d[0],none:true});
+  const sv=r=>r.none||!isRead(r)?-2:S(r).t??-1;
+  rows.sort((a,b)=>sv(b)-sv(a)||a.district.localeCompare(b.district));
+  const stat=r=>r.none?"No row in sheet":!r.link?"No link yet":/^error/i.test(r.status||"")?r.status:"Waiting to be read";
+  $("m-table").innerHTML=`<thead><tr><th>District</th><th>Mandal</th><th>Date</th><th class="n">Process /20</th><th class="n">Agenda /50</th><th class="n">Follow /30</th><th class="n">Total</th><th>Band</th><th>Confidence</th><th>Karyavrit</th><th>Key decisions</th></tr></thead><tbody>`+
+    rows.map(r=>{const u=safeUrl(r.link),lk=u?`<a href="${esc(u)}" target="_blank" rel="noopener">Open</a>`:"";
+      if(r.none||!isRead(r))return `<tr><td>${esc(r.district)}</td><td>${esc(MANDAL[r.district])}</td><td colspan="7" class="note">${esc(stat(r))}</td><td>${lk}</td><td></td></tr>`;
+      const s=S(r);return `<tr class="click" data-d="${esc(r.district)}" tabindex="0"><td><b>${esc(r.district)}</b></td><td>${esc(MANDAL[r.district])}</td><td style="white-space:nowrap">${esc(r.f.G||"–")}</td><td class="n">${f1(s.p)}</td><td class="n">${f1(s.a)}</td><td class="n">${f1(s.ft)}</td><td class="n"><b>${f1(s.t)}</b></td><td>${pill(s.band)}</td><td>${esc(r.f.AS||"–")}</td><td>${lk}</td><td style="min-width:220px">${esc(r.f.AN||"")}</td></tr>`}).join("")+"</tbody>";
+  for(const tr of $("m-table").querySelectorAll("tr.click")){const go=e=>{if(e.target.closest("a"))return;openDetail(inM.filter(r=>r.district===tr.dataset.d).pop())};tr.onclick=go;tr.onkeydown=e=>{if(e.key==="Enter")go(e)}}
+  const tc={};for(const r of rs)for(const c of["AO","AP","AQ"])if(r.f[c])tc[r.f[c]]=(tc[r.f[c]]||0)+1;
+  const te=Object.entries(tc).sort((a,b)=>b[1]-a[1]),tmax=Math.max(1,...te.map(t=>t[1]));
+  $("m-themes").innerHTML=te.length?te.map(([k,v])=>brow(k,v,tmax)).join(""):`<p class="note">No themes yet.</p>`;
+  const calls=rs.filter(r=>r.f.BB==="Yes"),rt=rs.map(r=>num(r.f.BE)).filter(x=>x!=null);
+  $("m-src").innerHTML=`<table><tbody>${[["Karyavrits read by Claude",rs.filter(r=>r.f.AR==="AI from MoM").length],["Low-confidence reads (review these)",rs.filter(r=>r.f.AS==="Low").length],["Reads flagged for district or month mismatch",rs.filter(r=>/^Check:/.test(r.f.AT||"")).length],["VSK / team calls done",calls.length],["Calls where MoM matched",calls.length?pct(calls.filter(r=>r.f.BD==="Yes").length/calls.length):"–"],["Escalations raised",rs.filter(r=>r.f.AK==="Yes").length],["Good practices noted",rs.filter(r=>(r.f.AM||"").trim()).length],["PM attended in person",rs.filter(r=>r.f.AU==="In person").length],["Average PM rating",rt.length?f1(rt.reduce((a,b)=>a+b,0)/rt.length):"–"]].map(x=>`<tr><td>${esc(x[0])}</td><td class="n"><b>${esc(x[1])}</b></td></tr>`).join("")}</tbody></table>`}
+$("m-month").onchange=renderMonth;$("m-mandal").onchange=renderMonth;
+
+/* ---------- detail ---------- */
+function openDetail(r){if(!r)return;const s=S(r),u=safeUrl(r.link);
+  $("d-title").textContent=`${r.district} · ${r.month}`;
+  const groups=[...new Set(F.map(f=>f[2]))];
+  $("d-body").innerHTML=`<div class="scorebar" style="position:static;margin-top:14px"><div><span>Process /20</span><b>${f1(s.p)}</b></div><div><span>Agenda /50</span><b>${f1(s.a)}</b></div><div><span>Follow-through /30</span><b>${f1(s.ft)}</b></div><div><span>Total /100</span><b>${f1(s.t)}</b></div><div>${pill(s.band)}</div></div>
+  <p class="note">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">Open the karyavrit</a> · `:""}Read on ${esc(r.readOn||"–")} · Attendance ${pct(s.att)} · actions with owner + deadline ${pct(s.bl)}</p>`+
+  groups.map(g=>`<h3>${esc(g)}</h3><table><tbody>${F.filter(f=>f[2]===g).map(f=>`<tr><td style="width:55%">${esc(f[1])}</td><td>${esc(r.f[f[0]]||"–")}</td></tr>`).join("")}</tbody></table>`).join("");
+  $("dlg").classList.remove("hidden");$("d-close").focus()}
+$("d-close").onclick=()=>$("dlg").classList.add("hidden");
+$("dlg").onclick=e=>{if(e.target===$("dlg"))$("dlg").classList.add("hidden")};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("dlg").classList.add("hidden")});
+
+/* ---------- composite ---------- */
+let trend=[];
+function renderComp(){
+  const md=$("c-mandal").value,sort=$("c-sort").value;
+  const rs=RECS.filter(r=>isRead(r)&&(!md||MANDAL[r.district]===md));
+  const ms=[...new Set(rs.map(r=>r.month))].sort((a,b)=>mkey(a)-mkey(b));
+  const by={};for(const r of rs)(by[r.district]??={})[r.month]=r;
+  const comp=n=>{const v=Object.values(by[n]||{}).filter(r=>S(r).band!=="Pending").map(r=>S(r).t);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const list=DIST.filter(d=>!md||d[1]===md).map(d=>({n:d[0],mandal:d[1],c:comp(d[0]),k:Object.keys(by[d[0]]||{}).length}));
+  list.sort(sort==="name"?(a,b)=>a.n.localeCompare(b.n):sort==="mandal"?(a,b)=>a.mandal.localeCompare(b.mandal)||a.n.localeCompare(b.n):(a,b)=>(b.c??-1)-(a.c??-1)||a.n.localeCompare(b.n));
+  const withC=list.filter(x=>x.c!=null),sa=withC.length?withC.reduce((a,x)=>a+x.c,0)/withC.length:null;
+  const bandOf=c=>c>=75?"Functional":c>=50?"Developing":"Needs support";
+  $("c-title").textContent=ms.length?`Composite across ${ms.length} month${ms.length>1?"s":""} (${ms[0]}${ms.length>1?" to "+ms[ms.length-1]:""}): state average ${f1(sa)}/100`:"No karyavrits read yet";
+  $("c-kpis").innerHTML=[[f1(sa),"state composite /100"],[withC.length,"districts with data"],[withC.filter(x=>x.c>=75).length,"Functional composite"],[withC.filter(x=>x.c>=50&&x.c<75).length,"Developing composite"],[withC.filter(x=>x.c<50).length,"Needs support composite"],[rs.length,"karyavrits read"]].map(k=>`<div class="kpi"><b>${esc(k[0])}</b><small>${esc(k[1])}</small></div>`).join("");
+  const col=b=>b==="Functional"?"var(--fn)":b==="Developing"?"var(--dv)":b==="Needs support"?"var(--ns)":b==="Not held"?"var(--nh)":"var(--pd)";
+  $("c-table").innerHTML=`<thead><tr><th class="sticky">District</th><th>Mandal</th>${ms.map(m=>`<th class="n">${esc(m)}</th>`).join("")}<th class="n">Months</th><th class="n">Composite</th><th>Band</th></tr></thead><tbody>`+
+    list.map(x=>`<tr><td class="sticky"><b>${esc(x.n)}</b></td><td>${esc(x.mandal)}</td>${ms.map(m=>{const r=(by[x.n]||{})[m];if(!r)return `<td class="c e">·</td>`;const s=S(r);return `<td class="c" style="background:${col(s.band)}" title="${esc(s.band)}">${s.band==="Not held"?"NH":s.band==="Pending"?"?":Math.round(s.t)}</td>`}).join("")}<td class="n">${x.k}</td><td class="n"><b>${f1(x.c)}</b></td><td>${x.c==null?"":pill(bandOf(x.c))}</td></tr>`).join("")+"</tbody>";
+  const mrows=MANDALS.filter(m=>!md||m===md).map(m=>{const ds=list.filter(x=>x.mandal===m&&x.c!=null);return {m,n:DIST.filter(d=>d[1]===m).length,k:ds.length,c:ds.length?ds.reduce((a,x)=>a+x.c,0)/ds.length:null,fn:ds.filter(x=>x.c>=75).length,ns:ds.filter(x=>x.c<50).length}}).sort((a,b)=>(b.c??-1)-(a.c??-1));
+  $("c-mandals").innerHTML=`<thead><tr><th>Mandal</th><th class="n">Districts</th><th class="n">With data</th><th class="n">Composite</th><th class="n">Functional</th><th class="n">Needs support</th></tr></thead><tbody>${mrows.map(r=>`<tr><td><b>${esc(r.m)}</b></td><td class="n">${r.n}</td><td class="n">${r.k}</td><td class="n">${f1(r.c)}</td><td class="n">${r.fn}</td><td class="n">${r.ns}</td></tr>`).join("")}</tbody>`;
+  trend=ms.map(m=>{const h=rs.filter(r=>r.month===m&&S(r).band!=="Pending");return {m,avg:h.length?h.reduce((a,r)=>a+S(r).t,0)/h.length:null,n:rs.filter(r=>r.month===m).length}});drawTrend()}
+const svg=$("c-svg");
+function drawTrend(){const Wd=svg.clientWidth,Ht=svg.clientHeight;if(!Wd)return;
+  if(!trend.length){svg.innerHTML=`<text x="${Wd/2}" y="${Ht/2}" text-anchor="middle" fill="currentColor" opacity=".6" font-size="14">The trend appears once karyavrits are read</text>`;return}
+  const L=40,R=16,T=18,B=42,iw=Wd-L-R,ih=Ht-T-B,bw=Math.min(46,iw/trend.length*.5),nmax=Math.max(...trend.map(t=>t.n),1);
+  const x=i=>L+iw*(trend.length===1?.5:(i+.5)/trend.length),y=v=>T+ih*(1-v/100);
+  let g="";for(const v of[0,25,50,75,100])g+=`<line x1="${L}" x2="${Wd-R}" y1="${y(v)}" y2="${y(v)}" stroke="currentColor" opacity="${v===75||v===50?.35:.12}" ${v===75||v===50?'stroke-dasharray="4 4"':""}/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="currentColor" opacity=".6">${v}</text>`;
+  const every=Math.ceil(trend.length/Math.max(1,Math.floor(iw/70)));
+  trend.forEach((t,i)=>{const h=ih*.35*t.n/nmax;g+=`<rect x="${x(i)-bw/2}" y="${T+ih-h}" width="${bw}" height="${h}" fill="var(--sea)"/><text x="${x(i)}" y="${T+ih-h-4}" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">${t.n}</text>`;
+    if(i%every===0)g+=`<text x="${x(i)}" y="${Ht-B+18}" text-anchor="middle" font-size="12" fill="currentColor">${esc(t.m)}</text>`});
+  const pts=trend.map((t,i)=>t.avg==null?null:[x(i),y(t.avg),t.avg]).filter(Boolean);
+  if(pts.length>1)g+=`<polyline points="${pts.map(p=>p[0]+","+p[1]).join(" ")}" fill="none" stroke="var(--mag)" stroke-width="2.5"/>`;
+  for(const p of pts)g+=`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="var(--mag)"/><text x="${p[0]}" y="${p[1]-10}" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">${f1(p[2])}</text>`;
+  g+=`<text x="${L}" y="${Ht-6}" font-size="12" fill="currentColor" opacity=".7">Line: average score /100 · bars: karyavrits read · dashed: band cut-offs 50 and 75</text>`;
+  svg.innerHTML=g}
+const ro=new ResizeObserver(drawTrend);ro.observe(svg);
+$("c-mandal").onchange=renderComp;$("c-sort").onchange=renderComp;
+
+/* ---------- CSV export: tracker column order ---------- */
+$("m-csv").onclick=()=>{
+  const m=$("m-month").value,rs=RECS.filter(r=>r.month===m&&isRead(r)&&(!$("m-mandal").value||MANDAL[r.district]===$("m-mandal").value));
+  const head=["Month","District","Forum","Block",...F.map(f=>f[1]),"Mandal","Assigned PM","Held in first week?","Attendance %","Working days to upload MoM","% actions with owner + deadline","Process score (/20)","Agenda score (/50)","Follow-through score (/30)","TOTAL (/100)","Band","Karyavrit link"];
+  const q=v=>{v=String(v??"");return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const lines=[head.map(q).join(",")];
+  for(const r of rs){const s=S(r);lines.push([r.month,r.district,DPMU,"",...F.map(f=>f[0]==="AJ"&&r.f.AJ?r.f.AJ+"%":r.f[f[0]]),MANDAL[r.district],PMOF[r.district],s.first||"",s.att==null?"":pct(s.att),s.bk??"",s.bl==null?"":pct(s.bl),s.p??"",s.a??"",s.ft??"",s.t??"",s.band,r.link||""].map(q).join(","))}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"}));a.download=`DPMU_tracker_${m}.csv`;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)};
+
+/* ---------- boot ---------- */
+if(location.hash==="#composite")showTab("t-comp");else render();
+load();
+}
+</script>
+</body>
+</html>
